@@ -7,5 +7,5 @@ pm2 serve /var/www/reactapp 3000 --name reactapp --spa
 pm2 save
 
 # Make PM2 resurrect on reboot
-sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu >/dev/null 2>&1 || true
+sudo env PATH=$PATH:/usr/bin pm2 startup systemd -u ec2-user --hp /home/ec2-user >/dev/null 2>&1 || true
 
