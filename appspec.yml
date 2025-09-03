@@ -29,8 +29,8 @@ hooks:
       # You should replace the placeholder values with the actual variables
       # configured in your deployment group.
       env:
-        DOCKERHUB_USERNAME: 'your-dockerhub-username'
-        DOCKERHUB_PASSWORD: 'your-dockerhub-password'
+        DOCKERHUB_USERNAME: 'aqsarehman'
+        DOCKERHUB_PASSWORD: 'dckr_pat_Ydy8LvO3hLQ3TgqewR_pmPaSUNg'
   ValidateService:
     - location: scripts/health_check.sh
       timeout: 60
