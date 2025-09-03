@@ -1,10 +1,9 @@
-# This is the AWS CodeDeploy AppSpec file. It defines the deployment actions
-# for your application.
+# This AppSpec file is now configured to work with AWS Systems Manager
+# to securely retrieve your Docker Hub credentials.
 version: 0.0
 os: linux
 
 # The `files` section tells CodeDeploy which files to copy to your server.
-# This assumes your deploy script is in the `scripts` directory of your repository.
 files:
   - source: docker-compose.yml
     destination: /var/www/reactapp
@@ -22,15 +21,10 @@ hooks:
       timeout: 300
       runas: root
   ApplicationStart:
+    # This hook now runs a modified script that fetches the credentials securely.
     - location: scripts/start_docker.sh
       timeout: 120
       runas: ec2-user
-      # The `env` block is crucial for passing environment variables to the script.
-      # You should replace the placeholder values with the actual variables
-      # configured in your deployment group.
-      env:
-        DOCKERHUB_USERNAME: 'aqsarehman'
-        DOCKERHUB_PASSWORD: 'dckr_pat_Ydy8LvO3hLQ3TgqewR_pmPaSUNg'
   ValidateService:
     - location: scripts/health_check.sh
       timeout: 60
