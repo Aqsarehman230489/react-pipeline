@@ -1,12 +1,17 @@
+# This is the AWS CodeDeploy AppSpec file. It defines the deployment actions
+# for your application.
 version: 0.0
 os: linux
 
+# The `files` section tells CodeDeploy which files to copy to your server.
+# This assumes your deploy script is in the `scripts` directory of your repository.
 files:
   - source: docker-compose.yml
     destination: /var/www/reactapp
   - source: scripts
     destination: /var/www/reactapp/scripts
 
+# The `hooks` section defines the actions to take at each stage of the deployment.
 hooks:
   BeforeInstall:
     - location: scripts/stop_pm2.sh
@@ -20,6 +25,12 @@ hooks:
     - location: scripts/start_docker.sh
       timeout: 120
       runas: ec2-user
+      # The `env` block is crucial for passing environment variables to the script.
+      # You should replace the placeholder values with the actual variables
+      # configured in your deployment group.
+      env:
+        DOCKERHUB_USERNAME: 'your-dockerhub-username'
+        DOCKERHUB_PASSWORD: 'your-dockerhub-password'
   ValidateService:
     - location: scripts/health_check.sh
       timeout: 60
