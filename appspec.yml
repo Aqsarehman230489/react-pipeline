@@ -1,10 +1,11 @@
 version: 0.0
 os: linux
 
-# Copy the React production files onto the instance
 files:
-  - source: build/
+  - source: docker-compose.yml
     destination: /var/www/reactapp
+  - source: scripts
+    destination: /var/www/reactapp/scripts
 
 hooks:
   BeforeInstall:
@@ -16,7 +17,7 @@ hooks:
       timeout: 300
       runas: root
   ApplicationStart:
-    - location: scripts/start_pm2.sh
+    - location: scripts/start_docker.sh
       timeout: 120
       runas: ec2-user
   ValidateService:

@@ -1,26 +1,43 @@
 version: 0.2
 
+env:
+  variables:
+    IMAGE_NAME: "react-app"
+  parameter-store:
+    DOCKERHUB_USERNAME: "/codebuild/dockerhub/username"
+    DOCKERHUB_PASSWORD: "/codebuild/dockerhub/password"
+
 phases:
   install:
     runtime-versions:
       nodejs: 18
     commands:
-      - echo "Installing dependencies"
+      - echo "Installing Node.js dependencies"
       - npm ci
+  
+  pre_build:
+    commands:
+      - echo "=== Logging in to Docker Hub ==="
+      - echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+  
   build:
     commands:
-      - echo "Building React app"
+      - echo "=== Building React app ==="
       - npm run build
+      - echo "=== Building Docker image ==="
+      - docker build -t $DOCKERHUB_USERNAME/$IMAGE_NAME:latest .
+      - docker tag $DOCKERHUB_USERNAME/$IMAGE_NAME:latest $DOCKERHUB_USERNAME/$IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
+  
   post_build:
     commands:
-      - echo "Preparing deployable artifact"
-      - mkdir -p dist
-      - cp -r build dist/build
-      - cp appspec.yml dist/
-      - mkdir -p dist/scripts
-      - cp -r scripts/* dist/scripts/
-      - chmod +x dist/scripts/*.sh
+      - echo "=== Pushing Docker images ==="
+      - docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:latest
+      - docker push $DOCKERHUB_USERNAME/$IMAGE_NAME:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - echo "=== Build completed successfully ==="
+
 artifacts:
   files:
-    - '**/*'
-  base-directory: dist
+    - appspec.yml
+    - scripts/**/*
+    - docker-compose.yml
+  discard-paths: yes

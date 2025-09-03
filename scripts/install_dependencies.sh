@@ -1,20 +1,20 @@
 #!/bin/bash
 set -e
 
-# Update system
+echo "=== Installing Docker on Amazon Linux ==="
+
+# Install Docker
 sudo yum update -y
+sudo amazon-linux-extras install docker -y
+sudo service docker start
+sudo systemctl enable docker
 
-# Install Node.js (LTS) if not already installed
-if ! command -v node >/dev/null 2>&1; then
-  curl -fsSL https://rpm.nodesource.com/setup_18.x | bash -
-  yum install -y nodejs gcc-c++ make
-fi
+# Add ec2-user to docker group
+sudo usermod -a -G docker ec2-user
 
-# Install PM2 + serve globally
-if ! command -v pm2 >/dev/null 2>&1; then npm install -g pm2; fi
-if ! command -v serve >/dev/null 2>&1; then npm install -g serve; fi
+# Install Docker Compose
+sudo curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 
-# Ensure app directory
-mkdir -p /var/www/reactapp
-chown -R ec2-user:ec2-user /var/www/reactapp
-
+echo "=== Docker setup completed ==="
